@@ -16,6 +16,8 @@ Call the service:
 
 `http POST localhost:3000 options='-q -s A4 -B 0.5in -L 0.5in -R 0.5in -T 0.5in --encoding UTF-8 --title "My Document" --load-error-handling ignore' type=file file=input.html`
 
+([httpie](https://httpie.org/))
+
 ## Payload
 
 ```js
