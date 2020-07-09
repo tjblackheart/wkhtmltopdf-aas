@@ -47,8 +47,8 @@ func main() {
 	srv := http.Server{
 		Addr:         s.hostname,
 		Handler:      r,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 5 * time.Second,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	log.Info("PDF service listening at", s.hostname)

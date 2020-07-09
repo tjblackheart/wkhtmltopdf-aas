@@ -18,7 +18,7 @@ Call the service:
 
 ## Payload
 
-```
+```js
 {
     "options": "", // a string of wkhtmltopdf options
     "type": "", // can be one of 'file', 'string' or 'url'
