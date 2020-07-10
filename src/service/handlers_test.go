@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHandleRequest(t *testing.T) {
@@ -17,63 +19,63 @@ func TestHandleRequest(t *testing.T) {
 		status   int
 	}{
 		{
-			`{"options":"--title Test","type":"file","file":"/tmp/test.html"}`,
-			`{"file":"/tmp/test.pdf","status":"success"}`,
+			`{ "options": "--title Test","type": "file","file": "/tmp/test.html" }`,
+			`{ "status": "success", "file": "/tmp/test.pdf" }`,
 			http.StatusOK,
 		},
 		{
-			`{"options":"--title Test","type":"string","string":"hello world!"}`,
-			`{"file":"/tmp/output.pdf","status":"success"}`,
+			`{ "options": "--title Test","type": "string","string": "hello world!" }`,
+			`{ "status": "success", "file": "/tmp/output.pdf" }`,
 			http.StatusOK,
 		},
 		{
-			`{"options":"--title Test","type":"url","url":"https://www.netzwerkorange.de/en"}`,
-			`{"file":"/tmp/www.netzwerkorange.de.pdf","status":"success"}`,
+			`{ "options": "--title Test","type": "url","url": "https://www.netzwerkorange.de/en" }`,
+			`{ "status": "success", "file": "/tmp/www.netzwerkorange.de.pdf" }`,
 			http.StatusOK,
 		},
 		{
-			`{"options":"--title Test","type":"file","file":"not_here"}`,
-			`{"error":"Input file not found. The file must reside in the shared dir."}`,
+			`{ "options": "--title Test", "type": "file", "file": "not_here" }`,
+			`{ "error": "Input file not found. The file must reside in the shared dir."}`,
 			http.StatusInternalServerError,
 		},
 		{
-			`{"options":"--title Test","type":"file"}`,
-			`{"error":"No filename provided."}`,
+			`{ "options": "--title Test","type": "file" }`,
+			`{ "error": "No filename provided." }`,
 			http.StatusBadRequest,
 		},
 		{
-			`{"options":"--title Test","type":"string","string":""}`,
-			`{"error":"No string provided."}`,
+			`{ "options": "--title Test","type": "string","string": "" }`,
+			`{ "error": "No string provided." }`,
 			http.StatusBadRequest,
 		},
 		{
-			`{"options":"--title Test","type":"file","string":"something"}`,
-			`{"error":"No filename provided."}`,
+			`{ "options": "--title Test","type": "file","string": "something" }`,
+			`{ "error": "No filename provided." }`,
 			http.StatusBadRequest,
 		},
 		{
-			`{"type":"unavailable"}`,
-			`{"error":"Type not available."}`,
+			`{ "type": "unavailable" }`,
+			`{ "error": "Type not available." }`,
 			http.StatusBadRequest,
 		},
 		{
 			`{}`,
-			`{"error":"Type not available."}`,
+			`{ "error": "Type not available." }`,
 			http.StatusBadRequest,
 		},
 		{
-			`{"type":"url", "url":"inval.id"}`,
-			`{"error":"Error fetching URL."}`,
+			`{ "type": "url", "url": "inval.id" }`,
+			`{ "error": "Error fetching URL." }`,
 			http.StatusInternalServerError,
 		},
 		{
-			`{"type":"url"}`,
-			`{"error":"No URL provided."}`,
+			`{ "type": "url" }`,
+			`{ "error": "No URL provided." }`,
 			http.StatusBadRequest,
 		},
 		{
-			`{invalid_json}`,
-			`{"error":"Invalid payload."}`,
+			`invalid_payload`,
+			`{ "error": "Invalid payload." }`,
 			http.StatusBadRequest,
 		},
 	}
@@ -89,15 +91,8 @@ func TestHandleRequest(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		handler := http.HandlerFunc(s.handleRequest)
-		handler.ServeHTTP(rr, req)
-
-		if status := rr.Code; status != tt.status {
-			t.Errorf("unexpected status code:\nhave %v\nwant %v\n", status, tt.status)
-		}
-
-		if rr.Body.String() != tt.expected {
-			t.Errorf("unexpected body:\nhave %v\nwant %v\n", rr.Body.String(), tt.expected)
-		}
+		http.HandlerFunc(s.handleRequest).ServeHTTP(rr, req)
+		assert.Equal(t, tt.status, rr.Code)
+		assert.JSONEq(t, tt.expected, rr.Body.String())
 	}
 }
