@@ -1,6 +1,6 @@
 # WKHTMLTOPDF as a service
 
-Print anything to a PDF as a webservice. The image is Ubuntu-based and around ~250MB.
+Print anything to a PDF as a webservice. The image is Ubuntu-based and around ~250MB and uses the latest version of wkhtmltopdf (0.12.6).
 
 ## Usage
 
