@@ -1,6 +1,6 @@
 # WKHTMLTOPDF as a service
 
-Print anything to a PDF as a webservice. The image is Ubuntu-based and around ~250MB and uses the latest version of wkhtmltopdf (0.12.6).
+Print anything to a PDF as a Golang webservice. The resulting image is Ubuntu-based, around 250MB in size and uses the latest version of wkhtmltopdf (0.12.6).
 
 ## Usage
 
