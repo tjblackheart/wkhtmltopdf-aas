@@ -75,6 +75,7 @@ func (s Service) processString(w http.ResponseWriter, r *http.Request) {
 	var err error
 	u := &url.URL{}
 
+	// from processURL
 	if s.request.Type == "url" && s.request.URL != "" {
 		u, err = url.Parse(s.request.URL)
 		if err != nil {
