@@ -28,21 +28,19 @@ type (
 	Map map[string]string
 )
 
-func New(hostname string) *Service {
-	s := &Service{
-		hostname: hostname,
-		shared:   "/app/shared",
-		binary:   "/usr/local/bin/wkhtmltopdf",
-	}
-
-	if _, err := os.Stat(s.shared); os.IsNotExist(err) {
+func New(hostname, shared, binary string) *Service {
+	if _, err := os.Stat(shared); os.IsNotExist(err) {
 		log.Fatalf("Shared dir not found. Mount a volume to %s first. Error: %s",
-			s.shared,
+			shared,
 			err.Error(),
 		)
 	}
 
-	return s
+	return &Service{
+		hostname: hostname,
+		shared:   shared,
+		binary:   binary,
+	}
 }
 
 func (s Service) router() *mux.Router {
@@ -60,6 +58,6 @@ func (s Service) Serve() {
 		WriteTimeout: 10 * time.Second,
 	}
 
-	log.Info("PDF service listening at", s.hostname)
+	log.Info("PDF service listening at ", s.hostname)
 	log.Fatalln(srv.ListenAndServe())
 }

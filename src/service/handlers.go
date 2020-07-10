@@ -17,7 +17,7 @@ import (
 func (s Service) handleRequest(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&s.request); err != nil {
 		log.Error(err)
-		s.response(w, http.StatusInternalServerError, Map{"error": err.Error()})
+		s.response(w, http.StatusBadRequest, Map{"error": "Invalid payload."})
 		return
 	}
 
@@ -36,6 +36,11 @@ func (s Service) handleRequest(w http.ResponseWriter, r *http.Request) {
 //
 
 func (s Service) processFile(w http.ResponseWriter, r *http.Request) {
+	if s.request.File == "" {
+		s.response(w, http.StatusBadRequest, Map{"error": "No filename provided."})
+		return
+	}
+
 	file := filepath.Base(s.request.File)
 	input := fmt.Sprintf("%s/%s", s.shared, file)
 	if _, err := os.Stat(input); os.IsNotExist(err) {
@@ -49,11 +54,15 @@ func (s Service) processFile(w http.ResponseWriter, r *http.Request) {
 	target := strings.TrimSuffix(file, filepath.Ext(file)) + ".pdf"
 	output := fmt.Sprintf("%s/%s", s.shared, target)
 
+	if s.request.Options == "" {
+		s.request.Options = "-q"
+	}
+
 	opts := strings.Split(s.request.Options, " ")
 	opts = append(opts, input)
 	opts = append(opts, output)
 
-	out, err := exec.Command("/usr/local/bin/wkhtmltopdf", opts...).CombinedOutput()
+	out, err := exec.Command(s.binary, opts...).CombinedOutput()
 	if err != nil {
 		log.Error(string(out), err)
 		s.response(w, http.StatusInternalServerError, Map{"error": err.Error()})
@@ -72,17 +81,11 @@ func (s Service) processString(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var err error
 	u := &url.URL{}
 
 	// from processURL
-	if s.request.Type == "url" && s.request.URL != "" {
-		u, err = url.Parse(s.request.URL)
-		if err != nil {
-			log.Error(err)
-			s.response(w, http.StatusBadRequest, Map{"error": "Error parsing URL."})
-			return
-		}
+	if s.request.Type == "url" {
+		u, _ = url.Parse(s.request.URL)
 	}
 
 	output := "output.html"
@@ -129,7 +132,7 @@ func (s Service) processURL(w http.ResponseWriter, r *http.Request) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		print(err)
+		log.Error(err)
 	}
 
 	s.request.String = string(body)
