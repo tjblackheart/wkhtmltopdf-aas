@@ -44,12 +44,12 @@ func TestHandleRequest(t *testing.T) {
 			http.StatusBadRequest,
 		},
 		{
-			`{ "options": "--title Test","type": "string","string": "" }`,
+			`{ "type": "string","string": "" }`,
 			`{ "error": "No string provided." }`,
 			http.StatusBadRequest,
 		},
 		{
-			`{ "options": "--title Test","type": "file","string": "something" }`,
+			`{ "type": "file","string": "something" }`,
 			`{ "error": "No filename provided." }`,
 			http.StatusBadRequest,
 		},
