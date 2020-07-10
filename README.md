@@ -1,6 +1,6 @@
 # WKHTMLTOPDF as a service
 
-Print anything to a PDF as a webservice.
+Print anything to a PDF as a webservice. The image is Ubuntu-based and around ~250MB.
 
 ## Usage
 
@@ -12,7 +12,7 @@ Run the container. Mount a shared directory to `/app/shared` where the PDF will 
 
 `docker run --rm -e APP_HOST=:3000 -v $(pwd)/shared:/app/shared -p 3000:3000 nwo/wkhtmltopdf`
 
-Call the service ([httpie](https://httpie.org/)):
+Call the service (i.e. with [httpie](https://httpie.org/)):
 
 `http POST localhost:3000 options='-q -s A4 -B 0.5in -L 0.5in -R 0.5in -T 0.5in --encoding UTF-8 --title "My Document" --load-error-handling ignore' type=file file=input.html`
 
