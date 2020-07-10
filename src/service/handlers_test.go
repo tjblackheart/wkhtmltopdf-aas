@@ -19,17 +19,17 @@ func TestHandleRequest(t *testing.T) {
 		status   int
 	}{
 		{
-			`{ "options": "--title Test","type": "file","file": "/tmp/test.html" }`,
+			`{ "options": "--title Test", "type": "file", "file": "/tmp/test.html" }`,
 			`{ "status": "success", "file": "/tmp/test.pdf" }`,
 			http.StatusOK,
 		},
 		{
-			`{ "options": "--title Test","type": "string","string": "hello world!" }`,
+			`{ "options": "--title Test", "type": "string", "string": "hello world!" }`,
 			`{ "status": "success", "file": "/tmp/output.pdf" }`,
 			http.StatusOK,
 		},
 		{
-			`{ "options": "--title Test","type": "url","url": "https://www.netzwerkorange.de/en" }`,
+			`{ "options": "--title Test", "type": "url", "url": "https://www.netzwerkorange.de/en" }`,
 			`{ "status": "success", "file": "/tmp/www.netzwerkorange.de.pdf" }`,
 			http.StatusOK,
 		},
@@ -39,17 +39,17 @@ func TestHandleRequest(t *testing.T) {
 			http.StatusInternalServerError,
 		},
 		{
-			`{ "options": "--title Test","type": "file" }`,
+			`{ "options": "--title Test", "type": "file" }`,
 			`{ "error": "No filename provided." }`,
 			http.StatusBadRequest,
 		},
 		{
-			`{ "type": "string","string": "" }`,
+			`{ "type": "string", "string": "" }`,
 			`{ "error": "No string provided." }`,
 			http.StatusBadRequest,
 		},
 		{
-			`{ "type": "file","string": "something" }`,
+			`{ "type": "file", "string": "something" }`,
 			`{ "error": "No filename provided." }`,
 			http.StatusBadRequest,
 		},
@@ -78,6 +78,11 @@ func TestHandleRequest(t *testing.T) {
 			`{ "error": "Invalid payload." }`,
 			http.StatusBadRequest,
 		},
+		{
+			``,
+			`{ "error": "Invalid payload." }`,
+			http.StatusBadRequest,
+		},
 	}
 
 	ioutil.WriteFile("/tmp/test.html", []byte("Hello world!"), 0644)
@@ -87,11 +92,10 @@ func TestHandleRequest(t *testing.T) {
 		r := bytes.NewReader([]byte(tt.payload))
 
 		req, err := http.NewRequest("POST", "/", r)
-		if err != nil {
-			t.Fatal(err)
-		}
+		assert.NoError(t, err)
 
 		http.HandlerFunc(s.handleRequest).ServeHTTP(rr, req)
+
 		assert.Equal(t, tt.status, rr.Code)
 		assert.JSONEq(t, tt.expected, rr.Body.String())
 	}
