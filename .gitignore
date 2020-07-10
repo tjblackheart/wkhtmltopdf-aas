@@ -1,2 +1,2 @@
-service/tmp
-shared/*
+src/tmp
+shared

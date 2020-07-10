@@ -1,7 +1,7 @@
 FROM golang:latest as build
 WORKDIR /app
-COPY service .
-RUN go build -o bin/service -ldflags="-s -w" ./...
+COPY src .
+RUN go build -o bin/service -ldflags="-s -w" main.go
 
 ##
 
