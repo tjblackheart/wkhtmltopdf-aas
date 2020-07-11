@@ -51,6 +51,12 @@ func (s Service) processFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := s.isSupported(input); err != nil {
+		log.Error(err)
+		s.response(w, http.StatusBadRequest, Map{"error": "Unsupported content type."})
+		return
+	}
+
 	target := strings.TrimSuffix(file, filepath.Ext(file)) + ".pdf"
 	output := fmt.Sprintf("%s/%s", s.shared, target)
 
@@ -65,7 +71,7 @@ func (s Service) processFile(w http.ResponseWriter, r *http.Request) {
 	out, err := exec.Command(s.binary, opts...).CombinedOutput()
 	if err != nil {
 		log.Error(string(out), err)
-		s.response(w, http.StatusInternalServerError, Map{"error": err.Error()})
+		s.response(w, http.StatusInternalServerError, Map{"error": "Error printing file."})
 		return
 	}
 
