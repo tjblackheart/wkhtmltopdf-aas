@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/tjblackheart/wpdf/service"
+	"github.com/tjblackheart/wkhtmltopdf-aas/service"
 )
 
 func main() {
