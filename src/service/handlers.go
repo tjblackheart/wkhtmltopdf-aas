@@ -136,9 +136,19 @@ func (s Service) processURL(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		log.Errorf("%s: %s", s.request.URL, resp.Status)
+		s.response(w, http.StatusInternalServerError, Map{
+			"error": fmt.Sprintf("Error fetching URL: %s", resp.Status),
+		})
+		return
+	}
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(err)
+		s.response(w, http.StatusInternalServerError, Map{"error": "Error parsing response body."})
+		return
 	}
 
 	s.request.String = string(body)

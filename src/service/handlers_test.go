@@ -69,6 +69,11 @@ func TestHandleRequest(t *testing.T) {
 			http.StatusInternalServerError,
 		},
 		{
+			`{ "type": "url", "url": "https://www.google.com/thatsa404" }`,
+			`{ "error": "Error fetching URL: 404 Not Found" }`,
+			http.StatusInternalServerError,
+		},
+		{
 			`{ "type": "url" }`,
 			`{ "error": "No URL provided." }`,
 			http.StatusBadRequest,
